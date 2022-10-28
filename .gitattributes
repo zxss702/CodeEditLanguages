@@ -1,0 +1,3 @@
+Sources/TreeSitterGrammars/**/parser.c !text !filter !merge !diff
+Sources/TreeSitterGrammars/**/scanner.c !text !filter !merge !diff
+Sources/TreeSitterGrammars/**/scanner.cc !text !filter !merge !diff
