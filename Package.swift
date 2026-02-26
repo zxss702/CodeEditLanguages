@@ -21,7 +21,7 @@ let package = Package(
         .package(url: "https://github.com/camdencheek/tree-sitter-dockerfile.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-lua", branch: "main"),
         .package(url: "https://github.com/fwcd/tree-sitter-kotlin", branch: "main"),
-        .package(url: "https://github.com/zxss702/tree-sitter-c.git", from: "0.24.1"),
+        .package(url: "https://github.com/zxss702/tree-sitter-c.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-cpp.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-c-sharp.git", branch: "master"),
         .package(url: "https://github.com/elixir-lang/tree-sitter-elixir.git", branch: "main"),
