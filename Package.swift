@@ -17,7 +17,7 @@ let package = Package(
             url: "https://github.com/tree-sitter/swift-tree-sitter",
             from: "0.9.0"
         ),
-        .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-yaml.git", branch: "master"),
+        .package(url: "https://github.com/zxss702/tree-sitter-yaml.git", branch: "master"),
         .package(url: "https://github.com/camdencheek/tree-sitter-dockerfile.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-lua", branch: "main"),
         .package(url: "https://github.com/fwcd/tree-sitter-kotlin", branch: "main"),
@@ -43,7 +43,7 @@ let package = Package(
         .package(url: "https://github.com/tree-sitter/tree-sitter-regex.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-html.git", branch: "master"),
         .package(url: "https://github.com/cengelbart39/tree-sitter-toml.git", branch: "feature/spm"),
-        .package(url: "https://github.com/tree-sitter/tree-sitter-python.git", branch: "master"),
+        .package(url: "https://github.com/zxss702/tree-sitter-python.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-scala.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-typescript.git", branch: "master"),
         .package(url: "https://github.com/DerekStride/tree-sitter-sql.git", branch: "gh-pages"),
