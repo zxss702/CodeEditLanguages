@@ -97,7 +97,6 @@ let package = Package(
                 .product(name: "TreeSitterVerilog", package: "tree-sitter-verilog"),
                 .product(name: "TreeSitterJSDoc", package: "tree-sitter-jsdoc"),
                 .product(name: "TreeSitterMarkdown", package: "tree-sitter-markdown"),
-                .product(name: "TreeSitterMarkdownInline", package: "tree-sitter-markdown"),
             ],
             resources: [
                 .copy("Resources")
