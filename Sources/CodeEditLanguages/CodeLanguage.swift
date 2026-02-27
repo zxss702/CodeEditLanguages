@@ -8,7 +8,6 @@
 import Foundation
 import TreeSitter
 import SwiftTreeSitter
-import CodeLanguages_Container
 import RegexBuilder
 
 /// A structure holding metadata for code languages
