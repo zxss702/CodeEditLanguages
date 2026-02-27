@@ -19,7 +19,7 @@ let package = Package(
         ),
         .package(url: "https://github.com/zxss702/tree-sitter-yaml.git", branch: "master"),
         .package(url: "https://github.com/camdencheek/tree-sitter-dockerfile.git", branch: "main"),
-        .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-lua", branch: "main"),
+        .package(url: "https://github.com/zxss702/tree-sitter-lua", branch: "main"),
         .package(url: "https://github.com/fwcd/tree-sitter-kotlin", branch: "main"),
         .package(url: "https://github.com/zxss702/tree-sitter-c.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-cpp.git", branch: "master"),
