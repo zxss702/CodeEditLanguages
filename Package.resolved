@@ -192,7 +192,7 @@
     {
       "identity" : "tree-sitter-lua",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tree-sitter-grammars/tree-sitter-lua",
+      "location" : "https://github.com/zxss702/tree-sitter-lua",
       "state" : {
         "branch" : "main",
         "revision" : "10fe0054734eec83049514ea2e718b2a56acd0c9"
