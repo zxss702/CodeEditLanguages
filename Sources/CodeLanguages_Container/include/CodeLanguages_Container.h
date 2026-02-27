@@ -3,7 +3,6 @@
 #ifndef CodeLanguages_Container_h
 #define CodeLanguages_Container_h
 
-// 这是一个空结构体声明，告诉 C 编译器 TSLanguage 是个类型即可
 typedef struct TSLanguage TSLanguage;
 
 #ifdef __cplusplus
