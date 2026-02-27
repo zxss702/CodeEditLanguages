@@ -56,9 +56,11 @@ let package = Package(
         .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-markdown", branch: "split_parser"),
     ],
     targets: [
+        .target(name: "CodeLanguages_Container"),
         .target(
             name: "CodeEditLanguages",
             dependencies: [
+                "CodeLanguages_Container",
                 .product(name: "SwiftTreeSitter", package: "swift-tree-sitter"),
                 .product(name: "TreeSitterYAML", package: "tree-sitter-yaml"),
                 .product(name: "TreeSitterDockerfile", package: "tree-sitter-dockerfile"),

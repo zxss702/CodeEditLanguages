@@ -1,18 +1,9 @@
-//
-//  CodeLanguages_Container.h
-//  CodeLanguages-Container
-//
-//  Created by Lukas Pistrol on 28.10.22.
-//
+// CodeLanguages_Container.h
 
-#import <Foundation/Foundation.h>
+#ifndef CodeLanguages_Container_h
+#define CodeLanguages_Container_h
 
-//! Project version number for CodeLanguages_Container.
-FOUNDATION_EXPORT double CodeLanguages_ContainerVersionNumber;
-
-//! Project version string for CodeLanguages_Container.
-FOUNDATION_EXPORT const unsigned char CodeLanguages_ContainerVersionString[];
-
+// 这是一个空结构体声明，告诉 C 编译器 TSLanguage 是个类型即可
 typedef struct TSLanguage TSLanguage;
 
 #ifdef __cplusplus
@@ -20,8 +11,6 @@ extern "C" {
 #endif
 
 // A collection of pointers to supported tree-sitter languages
-// Add new ones below (please keep an alphabetical order)
-
 extern TSLanguage *tree_sitter_agda();
 extern TSLanguage *tree_sitter_bash();
 extern TSLanguage *tree_sitter_c();
@@ -66,3 +55,5 @@ extern TSLanguage *tree_sitter_zig();
 #ifdef __cplusplus
 }
 #endif
+
+#endif // !CodeLanguages_Container_h
