@@ -9,6 +9,7 @@ import Foundation
 import TreeSitter
 import SwiftTreeSitter
 import RegexBuilder
+import CodeLanguages_Container
 
 /// A structure holding metadata for code languages
 public struct CodeLanguage {
