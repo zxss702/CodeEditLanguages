@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/ChimeHQ/SwiftTreeSitter.git",
+            url: "https://github.com/tree-sitter/swift-tree-sitter",
             from: "0.9.0"
         ),
         .package(url: "https://github.com/tree-sitter-grammars/tree-sitter-yaml.git", branch: "master"),
