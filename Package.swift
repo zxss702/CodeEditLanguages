@@ -59,7 +59,8 @@ let package = Package(
         .target(
             name: "CodeEditLanguages",
             dependencies: [
-                "SwiftTreeSitter",
+                
+                .product(name: "SwiftTreeSitter", package: "swift-tree-sitter"),
                 .product(name: "TreeSitterYAML", package: "tree-sitter-yaml"),
                 .product(name: "TreeSitterDockerfile", package: "tree-sitter-dockerfile"),
                 .product(name: "TreeSitterLua", package: "tree-sitter-lua"),
