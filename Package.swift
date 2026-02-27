@@ -103,7 +103,10 @@ let package = Package(
             resources: [
                 .copy("Resources")
             ],
-            linkerSettings: [.linkedLibrary("c++")]
+            linkerSettings: [
+                .linkedLibrary("c++", .when(platforms: [.macOS])),
+                .linkedLibrary("stdc++", .when(platforms: [.linux]))
+            ]
         ),
         .testTarget(
             name: "CodeEditLanguagesTests",
