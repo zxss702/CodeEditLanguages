@@ -59,7 +59,6 @@ let package = Package(
         .target(
             name: "CodeEditLanguages",
             dependencies: [
-                
                 .product(name: "SwiftTreeSitter", package: "swift-tree-sitter"),
                 .product(name: "TreeSitterYAML", package: "tree-sitter-yaml"),
                 .product(name: "TreeSitterDockerfile", package: "tree-sitter-dockerfile"),
@@ -73,7 +72,7 @@ let package = Package(
                 .product(name: "TreeSitterGoMod", package: "tree-sitter-go-mod"),
                 .product(name: "TreeSitterHaskell", package: "tree-sitter-haskell"),
                 .product(name: "TreeSitterJava", package: "tree-sitter-java"),
-                .product(name: "TreeSitterJS", package: "tree-sitter-javascript"),
+                .product(name: "TreeSitterJavaScript", package: "tree-sitter-javascript"),
                 .product(name: "TreeSitterJSON", package: "tree-sitter-json"),
                 .product(name: "TreeSitterPHP", package: "tree-sitter-php"),
                 .product(name: "TreeSitterRuby", package: "tree-sitter-ruby"),
