@@ -174,7 +174,7 @@
     {
       "identity" : "tree-sitter-julia",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tree-sitter/tree-sitter-julia.git",
+      "location" : "https://github.com/zxss702/tree-sitter-julia.git",
       "state" : {
         "branch" : "master",
         "revision" : "e0f9dcd180fdcfcfa8d79a3531e11d99e79321d3"
