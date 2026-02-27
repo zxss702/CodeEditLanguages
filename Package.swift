@@ -29,7 +29,7 @@ let package = Package(
         .package(url: "https://github.com/camdencheek/tree-sitter-go-mod.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-haskell.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-java.git", branch: "master"),
-        .package(url: "https://github.com/tree-sitter/tree-sitter-javascript.git", branch: "master"),
+        .package(url: "https://github.com/zxss702/tree-sitter-javascript.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-json.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-php.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-ruby.git", branch: "master"),
