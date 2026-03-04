@@ -67,43 +67,8 @@ public struct CodeLanguage {
         queryURL()
     }
 
-    /// 资源包的根 URL
-    /// 优先级：
-    /// 1. 环境变量 LOGORYTHIA_RESOURCES_DIR 指定的路径
-    /// 2. 可执行文件同级目录下的 resources/CodeEditLanguages_CodeEditLanguages.resources
-    /// 3. 系统安装路径 /usr/local/share/logorythia/CodeEditLanguages_CodeEditLanguages.resources
-    /// 4. Bundle.module.resourceURL（Xcode / macOS App Bundle 场景）
-    internal var resourceURL: URL? = {
-        let resourceBundleName = "CodeEditLanguages_CodeEditLanguages.resources"
-
-        // 1. 环境变量指定
-        if let envPath = ProcessInfo.processInfo.environment["LOGORYTHIA_RESOURCES_DIR"] {
-            let url = URL(fileURLWithPath: envPath)
-                .appendingPathComponent(resourceBundleName)
-            if FileManager.default.fileExists(atPath: url.path) {
-                return url
-            }
-        }
-
-        // 2. 可执行文件同级目录下的 resources/
-        let execURL = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
-        let siblingURL = execURL
-            .appendingPathComponent("resources")
-            .appendingPathComponent(resourceBundleName)
-        if FileManager.default.fileExists(atPath: siblingURL.path) {
-            return siblingURL
-        }
-
-        // 3. 系统安装路径
-        let systemURL = URL(fileURLWithPath: "/usr/local/share/logorythia")
-            .appendingPathComponent(resourceBundleName)
-        if FileManager.default.fileExists(atPath: systemURL.path) {
-            return systemURL
-        }
-
-        // 4. 回退到 Bundle.module（Xcode / macOS App Bundle）
-        return Bundle.module.resourceURL
-    }()
+    /// The bundle's resource URL
+    internal var resourceURL: URL? = Bundle.module.resourceURL
 
     /// A set of aditional identifiers to use for things like shebang matching.
     public let additionalIdentifiers: Set<String>
