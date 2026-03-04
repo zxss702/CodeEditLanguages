@@ -68,7 +68,17 @@ public struct CodeLanguage {
     }
 
     /// The bundle's resource URL
-    internal var resourceURL: URL? = Bundle.module.resourceURL
+    internal var resourceURL: URL? {
+#if os(Linux)
+        if let execDir = Bundle.main.executableURL?.resolvingSymlinksInPath().deletingLastPathComponent() {
+            let resourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+            if FileManager.default.fileExists(atPath: resourceDir.path) {
+                return resourceDir
+            }
+        }
+#endif
+        return Bundle.module.resourceURL
+    }
 
     /// A set of aditional identifiers to use for things like shebang matching.
     public let additionalIdentifiers: Set<String>
