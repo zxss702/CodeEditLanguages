@@ -69,14 +69,19 @@ public struct CodeLanguage {
 
     /// The bundle's resource URL
     internal var resourceURL: URL? {
-#if os(Linux)
         if let execDir = Bundle.main.executableURL?.resolvingSymlinksInPath().deletingLastPathComponent() {
-            let resourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
-            if FileManager.default.fileExists(atPath: resourceDir.path) {
-                return resourceDir
+#if os(Linux)
+            let linuxResourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+            if FileManager.default.fileExists(atPath: linuxResourceDir.path) {
+                return linuxResourceDir
             }
-        }
+#else
+            let macResourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.bundle")
+            if FileManager.default.fileExists(atPath: macResourceDir.path) {
+                return macResourceDir
+            }
 #endif
+        }
         return Bundle.module.resourceURL
     }
 
