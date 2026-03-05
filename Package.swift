@@ -47,7 +47,7 @@ let package = Package(
         .package(url: "https://github.com/tree-sitter/tree-sitter-scala.git", branch: "master"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-typescript.git", branch: "master"),
         .package(url: "https://github.com/DerekStride/tree-sitter-sql.git", branch: "gh-pages"),
-        .package(url: "https://github.com/tree-sitter/tree-sitter-ocaml.git", branch: "master"),
+        .package(url: "https://github.com/zxss702/tree-sitter-ocaml.git", branch: "main"),
         .package(url: "https://github.com/tree-sitter/tree-sitter-agda.git", branch: "master"),
         .package(url: "https://github.com/zxss702/tree-sitter-julia.git", branch: "master"),
         .package(url: "https://github.com/ganezdragon/tree-sitter-perl.git", branch: "master"),
