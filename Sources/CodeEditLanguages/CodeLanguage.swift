@@ -13,52 +13,45 @@ import CodeLanguages_Container
 
 let resourceURL: URL? = {
     let fileManager = FileManager.default
-#if os(macOS)
-    let containerName = "CodeEditLanguages_CodeEditLanguages.bundle"
-#else
-    let containerName = "CodeEditLanguages_CodeEditLanguages.resources"
-#endif
 
-    func resourceRoot(for container: URL) -> URL {
-#if os(macOS)
-        if container.pathExtension == "bundle" {
-            return Bundle(url: container)?.resourceURL ?? container
-        }
-#endif
-        return container
-    }
-
-    func firstExisting(_ candidates: [URL]) -> URL? {
-        candidates.first { fileManager.fileExists(atPath: $0.path) }.map(resourceRoot(for:))
-    }
-
-    var candidates: [URL] = []
-
-    if let moduleResourceURL = Bundle.module.resourceURL {
-        candidates.append(moduleResourceURL)
-    }
-
-    candidates.append(Bundle.module.bundleURL)
-
-    if let mainResourceURL = Bundle.main.resourceURL {
-        candidates.append(mainResourceURL.appendingPathComponent(containerName))
-    }
-
-    if let executableDirectory = Bundle.main.executableURL?
+    guard let executableDirectory = Bundle.main.executableURL?
         .resolvingSymlinksInPath()
         .deletingLastPathComponent()
-    {
-        candidates.append(executableDirectory.appendingPathComponent(containerName))
-
-#if os(macOS)
-        let appResourcesDirectory = executableDirectory
-            .deletingLastPathComponent()
-            .appendingPathComponent("Resources")
-        candidates.append(appResourcesDirectory.appendingPathComponent(containerName))
-#endif
+    else {
+        return nil
     }
 
-    return firstExisting(candidates)
+#if os(macOS)
+    let executableBundle = executableDirectory
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.bundle")
+    let appResourcesBundle = executableDirectory
+        .deletingLastPathComponent()
+        .appendingPathComponent("Resources")
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.bundle")
+
+    let candidates = [
+        executableBundle,
+        executableBundle.appendingPathComponent("Contents/Resources"),
+        appResourcesBundle,
+        appResourcesBundle.appendingPathComponent("Contents/Resources"),
+    ]
+#else
+    let executableResources = executableDirectory
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+    let appResources = executableDirectory
+        .deletingLastPathComponent()
+        .appendingPathComponent("Resources")
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+
+    let candidates = [
+        executableResources,
+        appResources,
+    ]
+#endif
+    
+    return candidates.first {
+        fileManager.fileExists(atPath: $0.appendingPathComponent("Resources").appendingPathComponent("tree-sitter-agda").path)
+    }
 }()
 
 /// A structure holding metadata for code languages
