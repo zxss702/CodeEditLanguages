@@ -11,6 +11,56 @@ import SwiftTreeSitter
 import RegexBuilder
 import CodeLanguages_Container
 
+let resourceURL: URL? = {
+    let fileManager = FileManager.default
+#if os(macOS)
+    let containerName = "CodeEditLanguages_CodeEditLanguages.bundle"
+#else
+    let containerName = "CodeEditLanguages_CodeEditLanguages.resources"
+#endif
+
+    func resourceRoot(for container: URL) -> URL {
+#if os(macOS)
+        if container.pathExtension == "bundle" {
+            return Bundle(url: container)?.resourceURL ?? container
+        }
+#endif
+        return container
+    }
+
+    func firstExisting(_ candidates: [URL]) -> URL? {
+        candidates.first { fileManager.fileExists(atPath: $0.path) }.map(resourceRoot(for:))
+    }
+
+    var candidates: [URL] = []
+
+    if let moduleResourceURL = Bundle.module.resourceURL {
+        candidates.append(moduleResourceURL)
+    }
+
+    candidates.append(Bundle.module.bundleURL)
+
+    if let mainResourceURL = Bundle.main.resourceURL {
+        candidates.append(mainResourceURL.appendingPathComponent(containerName))
+    }
+
+    if let executableDirectory = Bundle.main.executableURL?
+        .resolvingSymlinksInPath()
+        .deletingLastPathComponent()
+    {
+        candidates.append(executableDirectory.appendingPathComponent(containerName))
+
+#if os(macOS)
+        let appResourcesDirectory = executableDirectory
+            .deletingLastPathComponent()
+            .appendingPathComponent("Resources")
+        candidates.append(appResourcesDirectory.appendingPathComponent(containerName))
+#endif
+    }
+
+    return firstExisting(candidates)
+}()
+
 /// A structure holding metadata for code languages
 public struct CodeLanguage {
     internal init(
@@ -69,20 +119,7 @@ public struct CodeLanguage {
 
     /// The bundle's resource URL
     internal var resourceURL: URL? {
-        if let execDir = Bundle.main.executableURL?.resolvingSymlinksInPath().deletingLastPathComponent() {
-#if os(Linux)
-            let linuxResourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
-            if FileManager.default.fileExists(atPath: linuxResourceDir.path) {
-                return linuxResourceDir
-            }
-#else
-            let macResourceDir = execDir.appendingPathComponent("CodeEditLanguages_CodeEditLanguages.bundle")
-            if FileManager.default.fileExists(atPath: macResourceDir.path) {
-                return macResourceDir
-            }
-#endif
-        }
-        return Bundle.module.resourceURL
+        CodeEditLanguages.resourceURL
     }
 
     /// A set of aditional identifiers to use for things like shebang matching.
