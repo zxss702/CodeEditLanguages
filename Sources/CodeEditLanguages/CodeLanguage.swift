@@ -21,7 +21,13 @@ let resourceURL: URL? = {
         return nil
     }
 
-#if os(macOS)
+    let executableResources = executableDirectory
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+    let appResources = executableDirectory
+        .deletingLastPathComponent()
+        .appendingPathComponent("Resources")
+        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
+    
     let executableBundle = executableDirectory
         .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.bundle")
     let appResourcesBundle = executableDirectory
@@ -34,20 +40,9 @@ let resourceURL: URL? = {
         executableBundle.appendingPathComponent("Contents/Resources"),
         appResourcesBundle,
         appResourcesBundle.appendingPathComponent("Contents/Resources"),
-    ]
-#else
-    let executableResources = executableDirectory
-        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
-    let appResources = executableDirectory
-        .deletingLastPathComponent()
-        .appendingPathComponent("Resources")
-        .appendingPathComponent("CodeEditLanguages_CodeEditLanguages.resources")
-
-    let candidates = [
         executableResources,
         appResources,
     ]
-#endif
     
     return candidates.first {
         fileManager.fileExists(atPath: $0.appendingPathComponent("Resources").appendingPathComponent("tree-sitter-agda").path)
