@@ -24,7 +24,6 @@
     "default"
     "deferred"
     "do"
-    "dynamic"
     "else"
     "enum"
     "export"
@@ -36,7 +35,6 @@
     "finally"
     "for"
     "Function"
-    "get"
     "hide"
     "if"
     "implements"
@@ -49,12 +47,10 @@
     "mixin"
     "new"
     "on"
-    "operator"
     "part"
     "required"
     "return"
     "sealed"
-    "set"
     "show"
     "static"
     "super"
@@ -77,11 +73,6 @@
 ; specifically identify a node as a function call
 (((identifier) @function (#match? @function "^_?[a-z]"))
  . (selector . (argument_part))) @function
-
-; Annotations
-; --------------------
-(annotation
-  name: (identifier) @attribute)
 
 ; Operators and Tokens
 ; --------------------
@@ -161,9 +152,13 @@
 (function_signature
   name: (identifier) @function)
 (getter_signature
+  "get" @keyword
   (identifier) @function)
 (setter_signature
+  "set" @keyword
   name: (identifier) @function)
+(operator_signature
+  "operator" @keyword)
 
 ((scoped_identifier
   scope: (identifier) @type
@@ -244,3 +239,41 @@
 
 (documentation_comment) @comment
 (comment) @comment
+
+; Annotations
+; --------------------
+(annotation
+  "@" @attribute
+  name: (identifier) @attribute)
+
+; Modern Dart 3+ Features
+; --------------------
+
+; Extension Types
+(extension_type_declaration
+  "type" @keyword)
+
+(extension_type_declaration
+  name: (identifier) @type)
+
+(representation_declaration
+  name: (identifier) @property)
+
+; Switch Guards ("when")
+(switch_expression_case
+  "when" @keyword)
+
+(switch_statement_case
+  "when" @keyword)
+
+; Patterns & Pattern Matching
+(object_pattern
+  (identifier) @property)
+
+(record_pattern
+  (identifier) @property)
+
+; Record Types
+(record_type_field
+  (identifier) @variable)
+
