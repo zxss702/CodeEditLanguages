@@ -24,13 +24,19 @@ A collection of `tree-sitter` languages for syntax highlighting.
 
 ## Overview
 
-This package includes a binary framework `CodeLanguagesContainer.xcframework` which bundles all `tree-sitter` languages in a single binary to greatly reduce SPM package resolution times.
+Tree-sitter grammar sources are vendored under `Sources/TreeSitterGrammars/` and built as local SPM targets, so dependents only need to resolve this package plus [SwiftTreeSitter](https://github.com/tree-sitter/swift-tree-sitter) (instead of dozens of separate `tree-sitter-*` packages).
 
 The languages are then served as a `CodeLanguage`.
 
+To refresh vendored grammars, update `Scripts/grammars.json` and run:
+
+```bash
+./Scripts/vendor-grammars.sh
+```
+
 ## SwiftTreeSitter
 
-This package heavily depends on [SwiftTreeSitter](https://github.com/ChimeHQ/SwiftTreeSitter) by [Matt Massicotte](https://twitter.com/mattie).
+This package depends on [SwiftTreeSitter](https://github.com/tree-sitter/swift-tree-sitter) / [ChimeHQ/SwiftTreeSitter](https://github.com/ChimeHQ/SwiftTreeSitter) by [Matt Massicotte](https://twitter.com/mattie).
 
 ## Documentation
 

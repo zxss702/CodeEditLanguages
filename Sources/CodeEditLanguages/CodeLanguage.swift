@@ -106,9 +106,10 @@ public struct CodeLanguage {
     }
 
     /// The bundle's resource URL
-    internal var resourceURL: URL? {
-        CodeEditLanguages.resourceURL
-    }
+    ///
+    /// Defaults to the packaged app layout when present, otherwise SPM's `Bundle.module`.
+    /// Tests may override this to point at a known resource root.
+    internal var resourceURL: URL? = CodeEditLanguages.resourceURL ?? Bundle.module.resourceURL
 
     /// A set of aditional identifiers to use for things like shebang matching.
     public let additionalIdentifiers: Set<String>
