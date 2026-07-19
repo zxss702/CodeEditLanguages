@@ -1,6 +1,9 @@
 Sources/CodeEditLanguages/Resources/** linguist-vendored
 .github/** linguist-vendored
 Sources/CodeEditLanguages/Documentation.docc/** linguist-documentation
+Sources/TreeSitterGrammars/**/parser.c filter=lfs diff=lfs merge=lfs -text
+Sources/TreeSitterGrammars/**/scanner.c filter=lfs diff=lfs merge=lfs -text
+Sources/TreeSitterGrammars/**/scanner.cc filter=lfs diff=lfs merge=lfs -text
 Sources/TreeSitterGrammars/**/parser.c !text !filter !merge !diff
 Sources/TreeSitterGrammars/**/scanner.c !text !filter !merge !diff
 Sources/TreeSitterGrammars/**/scanner.cc !text !filter !merge !diff
