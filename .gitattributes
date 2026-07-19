@@ -2,6 +2,8 @@ Sources/CodeEditLanguages/Resources/** linguist-vendored
 Sources/TreeSitterGrammars/** linguist-vendored
 .github/** linguist-vendored
 Sources/CodeEditLanguages/Documentation.docc/** linguist-documentation
+
+# Large generated tree-sitter sources
 Sources/TreeSitterGrammars/**/parser.c filter=lfs diff=lfs merge=lfs -text
 Sources/TreeSitterGrammars/**/scanner.c filter=lfs diff=lfs merge=lfs -text
 Sources/TreeSitterGrammars/**/scanner.cc filter=lfs diff=lfs merge=lfs -text

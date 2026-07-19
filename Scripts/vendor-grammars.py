@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -15,6 +16,12 @@ MANIFEST = Path(__file__).resolve().parent / "grammars.json"
 LOCK = Path(__file__).resolve().parent / "grammars.lock"
 VENDOR_ROOT = ROOT / "Sources" / "TreeSitterGrammars"
 PACKAGE_SWIFT = ROOT / "Package.swift"
+
+# Side files that scanners #include but are not listed in SPM sources.
+SIDE_GLOBS = (
+    "schema.*.c",
+    "*.h",
+)
 
 
 def run(cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -65,6 +72,111 @@ def filter_sources(vendor_dir: Path, target: dict) -> list[str]:
     return existing
 
 
+def collect_keep_paths(dest: Path, grammar: dict) -> set[Path]:
+    """Paths under dest that must remain after pruning."""
+    keep: set[Path] = set()
+
+    for target in grammar["targets"]:
+        base = dest / target["path"] if target["path"] != "." else dest
+        for src in target["sources"]:
+            source_path = (base / src).resolve()
+            if not source_path.exists():
+                continue
+            keep.add(source_path)
+            src_dir = source_path.parent
+            tree_sitter_dir = src_dir / "tree_sitter"
+            if tree_sitter_dir.is_dir():
+                for header in tree_sitter_dir.glob("*.h"):
+                    keep.add(header.resolve())
+            for pattern in SIDE_GLOBS:
+                for side in src_dir.glob(pattern):
+                    if side.is_file():
+                        keep.add(side.resolve())
+
+    # Public Swift/C headers
+    for header in dest.rglob("*.h"):
+        parts = header.parts
+        if "bindings" in parts and "swift" in parts:
+            keep.add(header.resolve())
+
+    # Shared scanner headers (typescript / php / ocaml)
+    common = dest / "common"
+    if common.is_dir():
+        for header in common.rglob("*.h"):
+            keep.add(header.resolve())
+
+    # Licenses
+    for candidate in dest.iterdir():
+        if candidate.is_file() and candidate.name.upper().startswith("LICENSE"):
+            keep.add(candidate.resolve())
+
+    return keep
+
+
+def prune_grammar(dest: Path, grammar: dict) -> int:
+    """Remove files not needed to build SPM targets. Returns bytes removed."""
+    if not dest.is_dir():
+        return 0
+
+    keep = collect_keep_paths(dest, grammar)
+    removed = 0
+    for path in sorted(dest.rglob("*"), reverse=True):
+        if not path.is_file():
+            continue
+        if path.resolve() in keep:
+            continue
+        removed += path.stat().st_size
+        path.unlink()
+        print("  prune %s" % path.relative_to(dest), flush=True)
+
+    # Remove empty directories (bottom-up), keep dest itself
+    for path in sorted(dest.rglob("*"), reverse=True):
+        if path.is_dir() and not any(path.iterdir()):
+            path.rmdir()
+
+    return removed
+
+
+def synthesize_headers(dest: Path, gid: str, grammar: dict) -> None:
+    for target in grammar["targets"]:
+        headers_rel = target["publicHeadersPath"]
+        if target["path"] != ".":
+            headers_dir = dest / target["path"] / headers_rel
+        else:
+            headers_dir = dest / headers_rel
+        if headers_dir.exists() and any(headers_dir.rglob("*.h")):
+            continue
+        func = "tree_sitter_" + gid.removeprefix("tree-sitter-").replace("-", "_")
+        special = {
+            "TreeSitterGoMod": "tree_sitter_gomod",
+            "TreeSitterCSharp": "tree_sitter_c_sharp",
+            "TreeSitterMarkdownInline": "tree_sitter_markdown_inline",
+            "TreeSitterTSX": "tree_sitter_tsx",
+            "TreeSitterSql": "tree_sitter_sql",
+        }
+        func = special.get(target["name"], func)
+        module_dir = headers_dir / target["name"]
+        module_dir.mkdir(parents=True, exist_ok=True)
+        header_name = gid.removeprefix("tree-sitter-").replace("-", "_") + ".h"
+        header_path = module_dir / header_name
+        guard = target["name"].upper()
+        header_path.write_text(
+            "#ifndef TREE_SITTER_%s_H_\n"
+            "#define TREE_SITTER_%s_H_\n\n"
+            "typedef struct TSLanguage TSLanguage;\n\n"
+            "#ifdef __cplusplus\n"
+            'extern "C" {\n'
+            "#endif\n\n"
+            "const TSLanguage *%s(void);\n\n"
+            "#ifdef __cplusplus\n"
+            "}\n"
+            "#endif\n\n"
+            "#endif\n"
+            % (guard, guard, func)
+        )
+        print("  synthesized header %s" % header_path.relative_to(dest), flush=True)
+
+
 def vendor_one(grammar: dict, tmp: Path, lock: dict) -> list[dict]:
     gid = grammar["id"]
     url = grammar["url"]
@@ -98,51 +210,32 @@ def vendor_one(grammar: dict, tmp: Path, lock: dict) -> list[dict]:
     for rel in grammar["copy"]:
         copy_path(clone_dir, rel, dest)
 
-    # Some grammars (e.g. perl) ship without Swift bindings; synthesize a header.
-    for target in grammar["targets"]:
-        headers_rel = target["publicHeadersPath"]
-        if target["path"] != ".":
-            headers_dir = dest / target["path"] / headers_rel
-        else:
-            headers_dir = dest / headers_rel
-        if headers_dir.exists() and any(headers_dir.rglob("*.h")):
-            continue
-        func = "tree_sitter_" + gid.removeprefix("tree-sitter-").replace("-", "_")
-        # Special-cases where SPM/symbol names diverge from repo id.
-        special = {
-            "TreeSitterGoMod": "tree_sitter_gomod",
-            "TreeSitterCSharp": "tree_sitter_c_sharp",
-            "TreeSitterMarkdownInline": "tree_sitter_markdown_inline",
-            "TreeSitterTSX": "tree_sitter_tsx",
-            "TreeSitterSql": "tree_sitter_sql",
-        }
-        func = special.get(target["name"], func)
-        module_dir = headers_dir / target["name"]
-        module_dir.mkdir(parents=True, exist_ok=True)
-        header_name = gid.removeprefix("tree-sitter-").replace("-", "_") + ".h"
-        header_path = module_dir / header_name
-        guard = target["name"].upper()
-        header_path.write_text(
-            "#ifndef TREE_SITTER_%s_H_\n"
-            "#define TREE_SITTER_%s_H_\n\n"
-            "typedef struct TSLanguage TSLanguage;\n\n"
-            "#ifdef __cplusplus\n"
-            'extern "C" {\n'
-            "#endif\n\n"
-            "const TSLanguage *%s(void);\n\n"
-            "#ifdef __cplusplus\n"
-            "}\n"
-            "#endif\n\n"
-            "#endif\n"
-            % (guard, guard, func)
-        )
-        print("  synthesized header %s" % header_path.relative_to(dest), flush=True)
+    synthesize_headers(dest, gid, grammar)
+    removed = prune_grammar(dest, grammar)
+    if removed:
+        print("  pruned %.1f MB" % (removed / (1024 * 1024)), flush=True)
 
     resolved_targets = []
     for target in grammar["targets"]:
         sources = filter_sources(dest, target)
         resolved_targets.append({**target, "sources": sources, "grammar_id": gid})
     return resolved_targets
+
+
+def prune_existing() -> int:
+    manifest = json.loads(MANIFEST.read_text())
+    total = 0
+    for grammar in manifest["grammars"]:
+        dest = VENDOR_ROOT / grammar["id"]
+        if not dest.is_dir():
+            print("skip missing %s" % grammar["id"], flush=True)
+            continue
+        print("\n==> prune %s" % grammar["id"], flush=True)
+        removed = prune_grammar(dest, grammar)
+        total += removed
+        print("  pruned %.1f MB" % (removed / (1024 * 1024)), flush=True)
+    print("\nTotal pruned: %.1f MB" % (total / (1024 * 1024)), flush=True)
+    return 0
 
 
 def swift_string_list(items: list[str], indent: int) -> str:
@@ -152,8 +245,6 @@ def swift_string_list(items: list[str], indent: int) -> str:
 
 
 def generate_package_swift(all_targets: list[dict]) -> None:
-    dep_names = [t["name"] for t in all_targets]
-    # Keep a stable, readable order matching historical Package.swift
     preferred = [
         "TreeSitterYAML",
         "TreeSitterDockerfile",
@@ -282,7 +373,7 @@ let package = Package(
     print("\nWrote %s" % PACKAGE_SWIFT, flush=True)
 
 
-def main() -> int:
+def vendor_all() -> int:
     manifest = json.loads(MANIFEST.read_text())
     VENDOR_ROOT.mkdir(parents=True, exist_ok=True)
     lock: dict = {}
@@ -297,10 +388,22 @@ def main() -> int:
     print(f"\nWrote {LOCK}", flush=True)
     generate_package_swift(all_targets)
 
-    # Keep directory so SPM sees sources
     (VENDOR_ROOT / ".gitkeep").write_text("")
     print("\nDone.", flush=True)
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--prune-only",
+        action="store_true",
+        help="Prune existing Sources/TreeSitterGrammars without re-cloning",
+    )
+    args = parser.parse_args()
+    if args.prune_only:
+        return prune_existing()
+    return vendor_all()
 
 
 if __name__ == "__main__":
